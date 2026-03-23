@@ -7,7 +7,7 @@ import { AuthController } from './auth.controller';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { JwtRefreshStrategy } from './strategies/jwt-refresh.strategy';
 import { StringValue } from 'ms';
-// import { UsersModule } from '../users/users.module';
+import { UsersModule } from '../users/users.module';
 
 @Module({
   imports: [
@@ -19,7 +19,7 @@ import { StringValue } from 'ms';
         expiresIn: (process.env.JWT_ACCESS_EXPIRES_IN ?? '15m') as StringValue,
       },
     }),
-    // UsersModule,
+    UsersModule,
   ],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy, JwtRefreshStrategy],
