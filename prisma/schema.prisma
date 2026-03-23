@@ -1,13 +1,120 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
+// prisma/schema.prisma
 
 generator client {
-  provider = "prisma-client"
-  output   = "../generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
+}
+
+// ─────────────────────────────────────────
+// TENANT (Organization)
+// ─────────────────────────────────────────
+model Tenant {
+  id        String   @id @default(uuid())
+  name      String
+  slug      String   @unique        // used in subdomains / API paths
+  plan      Plan     @default(FREE)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  users     UserTenant[]
+  invites   Invite[]
+
+  @@map("tenants")
+}
+
+// ─────────────────────────────────────────
+// USER
+// ─────────────────────────────────────────
+model User {
+  id             String   @id @default(uuid())
+  email          String   @unique
+  passwordHash   String
+  firstName      String?
+  lastName       String?
+  isEmailVerified Boolean @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  tenants        UserTenant[]
+  refreshTokens  RefreshToken[]
+
+  @@map("users")
+}
+
+// ─────────────────────────────────────────
+// USER <-> TENANT  (many-to-many with role)
+// ─────────────────────────────────────────
+model UserTenant {
+  id       String @id @default(uuid())
+  userId   String
+  tenantId String
+  role     Role   @default(MEMBER)
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([userId, tenantId])
+  @@map("user_tenants")
+}
+
+// ─────────────────────────────────────────
+// REFRESH TOKEN  (stored hashed, rotated on each use)
+// ─────────────────────────────────────────
+model RefreshToken {
+  id        String   @id @default(uuid())
+  tokenHash String   @unique          // bcrypt hash — never store raw
+  userId    String
+  expiresAt DateTime
+  revokedAt DateTime?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("refresh_tokens")
+}
+
+// ─────────────────────────────────────────
+// INVITE
+// ─────────────────────────────────────────
+model Invite {
+  id        String       @id @default(uuid())
+  email     String
+  tenantId  String
+  role      Role         @default(MEMBER)
+  token     String       @unique       // signed token sent via email
+  status    InviteStatus @default(PENDING)
+  expiresAt DateTime
+  createdAt DateTime     @default(now())
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@map("invites")
+}
+
+// ─────────────────────────────────────────
+// ENUMS
+// ─────────────────────────────────────────
+enum Role {
+  OWNER
+  ADMIN
+  MEMBER
+  VIEWER
+}
+
+enum Plan {
+  FREE
+  PRO
+  ENTERPRISE
+}
+
+enum InviteStatus {
+  PENDING
+  ACCEPTED
+  EXPIRED
+  REVOKED
 }
