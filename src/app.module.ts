@@ -9,6 +9,7 @@ import { AuthModule } from './auth/auth.module';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
 import { TenantsModule } from './tenants/tenants.module';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { TenantsModule } from './tenants/tenants.module';
     PrismaModule,
     AuthModule,
     TenantsModule,
+    UsersModule,
   ],
   controllers: [AppController],
   providers: [
