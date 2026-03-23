@@ -11,6 +11,7 @@ import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
 import { TenantsModule } from './tenants/tenants.module';
 import { UsersModule } from './users/users.module';
 import { BillingModule } from './billing/billing.module';
+import { MailModule } from './mail/mail.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { BillingModule } from './billing/billing.module';
     TenantsModule,
     UsersModule,
     BillingModule,
+    MailModule,
   ],
   controllers: [AppController],
   providers: [
