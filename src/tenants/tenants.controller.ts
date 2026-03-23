@@ -56,12 +56,14 @@ export class TenantsController {
   }
 
   @Post(':id/invite')
-  @ApiOperation({ summary: 'Invite a member to the tenant' })
-  @ApiHeader({ name: 'x-tenant-id', required: true })
   @UseGuards(RolesGuard)
   @Roles(Role.ADMIN)
-  invite(@Param('id') id: string, @Body() dto: InviteMemberDto) {
-    return this.tenantsService.inviteMember(id, dto);
+  invite(
+    @Param('id') id: string,
+    @Body() dto: InviteMemberDto,
+    @CurrentUser() user: JwtPayload,
+  ) {
+    return this.tenantsService.inviteMember(id, dto, user.sub);
   }
 
   @Post('invites/:token/accept')

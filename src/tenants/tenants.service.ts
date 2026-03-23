@@ -10,12 +10,16 @@ import { PrismaService } from '../prisma/prisma.service';
 import { CreateTenantDto } from './dto/create-tenant.dto';
 import { InviteMemberDto } from './dto/invite-member.dto';
 import { v4 as uuid } from 'uuid';
+import { MailService } from 'src/mail/mail.service';
 
 @Injectable()
 export class TenantsService {
   private readonly logger = new Logger(TenantsService.name);
 
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly mail: MailService,
+  ) {}
 
   // ── Create tenant ──────────────────────────────────────────────────────────
   async create(userId: string, dto: CreateTenantDto) {
@@ -74,11 +78,25 @@ export class TenantsService {
   }
 
   // ── Invite member ──────────────────────────────────────────────────────────
-  async inviteMember(tenantId: string, dto: InviteMemberDto) {
+  async inviteMember(
+    tenantId: string,
+    dto: InviteMemberDto,
+    inviterId: string,
+  ) {
     const tenant = await this.prisma.tenant.findUnique({
       where: { id: tenantId },
     });
     if (!tenant) throw new NotFoundException('Tenant not found');
+
+    // fetch inviter name
+    const inviter = await this.prisma.user.findUnique({
+      where: { id: inviterId },
+      select: { firstName: true, lastName: true, email: true },
+    });
+
+    const inviterName = inviter?.firstName
+      ? `${inviter.firstName} ${inviter.lastName ?? ''}`.trim()
+      : (inviter?.email ?? 'A team member');
 
     // Check if already a member
     const existingUser = await this.prisma.user.findUnique({
@@ -121,10 +139,21 @@ export class TenantsService {
 
     this.logger.log(`Invite sent to ${dto.email} for tenant ${tenantId}`);
 
-    // In production you would send an email here with the invite token
-    return {
-      message: 'Invite created successfully',
+    await this.mail.sendInviteEmail({
+      toEmail: invite.email,
+      inviterName, // replace with real user name once you have it in context
+      tenantName: tenant.name,
       inviteToken: invite.token,
+      role: invite.role,
+      expiresAt: invite.expiresAt,
+    });
+    console.log(
+      '🚀 ~ TenantsService ~ inviteMember ~ inviterName:',
+      inviterName,
+    );
+
+    return {
+      message: 'Invite sent successfully',
       expiresAt: invite.expiresAt,
     };
   }
