@@ -10,6 +10,7 @@ import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
 import { TenantsModule } from './tenants/tenants.module';
 import { UsersModule } from './users/users.module';
+import { BillingModule } from './billing/billing.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { UsersModule } from './users/users.module';
     AuthModule,
     TenantsModule,
     UsersModule,
+    BillingModule,
   ],
   controllers: [AppController],
   providers: [
