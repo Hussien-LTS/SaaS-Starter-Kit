@@ -8,6 +8,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { AuthModule } from './auth/auth.module';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
+import { TenantsModule } from './tenants/tenants.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
     ThrottlerModule.forRoot([{ ttl: 60000, limit: 100 }]),
     PrismaModule,
     AuthModule,
+    TenantsModule,
   ],
   controllers: [AppController],
   providers: [
