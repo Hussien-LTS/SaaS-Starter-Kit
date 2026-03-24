@@ -83,21 +83,6 @@ src/
 
 See `.env.example` for all required variables.
 
-| Variable | Description |
-|---|---|
-| `DATABASE_URL` | PostgreSQL connection string (pooled) |
-| `DIRECT_URL` | PostgreSQL direct connection (for migrations) |
-| `JWT_ACCESS_SECRET` | Secret for signing access tokens |
-| `JWT_REFRESH_SECRET` | Secret for signing refresh tokens |
-| `STRIPE_SECRET_KEY` | Stripe secret key (when billing is enabled) |
-
-## What I'd Add Next
-
-- Email service for invite notifications (Resend / Nodemailer)
-- Real Stripe checkout + webhook processing
-- Refresh token family detection (reuse detection)
-- CI/CD pipeline with GitHub Actions
-
 ## License
 
 MIT
