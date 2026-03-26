@@ -69,8 +69,8 @@ export class BillingService {
       payment_method_types: ['card'],
       customer_email: user?.email,
       line_items: [{ price: priceId, quantity: 1 }],
-      success_url: `${this.config.get('APP_URL')}/api/v1/billing/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${this.config.get('APP_URL')}/api/v1/billing/cancel`,
+      success_url: `${this.config.get('FRONTEND_URL')}/billing/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${this.config.get('FRONTEND_URL')}/billing/cancel`,
       metadata: { tenantId, plan: dto.plan },
     });
 
