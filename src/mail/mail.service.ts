@@ -21,9 +21,7 @@ export class MailService {
   }
 
   async sendInviteEmail(payload: InviteEmailPayload): Promise<void> {
-    const appUrl =
-      this.config.get<string>('APP_URL') ?? 'http://localhost:3000';
-    const acceptUrl = `${appUrl}/api/v1/tenants/invites/${payload.inviteToken}/accept`;
+    const acceptUrl = `${this.config.get('FRONTEND_URL')}/invites/${payload.inviteToken}/accept`;
     const expiryDate = payload.expiresAt.toLocaleDateString('en-US', {
       weekday: 'long',
       year: 'numeric',
